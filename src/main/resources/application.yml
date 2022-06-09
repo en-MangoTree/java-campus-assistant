@@ -1,0 +1,46 @@
+#端口号
+server:
+  port: 8800
+
+spring:
+  #配置mysql
+  datasource:
+    url:  jdbc:mysql://localhost:3306/campusassistant?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 6666
+  application:
+    name: CampusAssistant
+
+#配置mybatis
+mybatis:
+  #  mapper路径
+  mapper-locations: classpath:mapper/*.xml
+  #  实体类路径
+  type-aliases-package: com.knockknock.entity
+  #  mybatis内置配置
+  configuration:
+    #    打印日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #    开启驼峰命名
+    map-underscore-to-camel-case: true
+
+#jwt配置
+jwt:
+  #  请求头
+  tokenHeader: Authorization
+  #  签名加盐
+  secret: 321123aa
+  #  jwt过期时间（秒）
+  expiration: 18000000
+  #  token头部
+  tokenHead: 'Bearer '
+
+#redis配置
+redis:
+  #  配置主机
+  host: 127.0.0.1
+  # 数据库序号
+  database: 0
+  #  指定端口
+  port: 6379

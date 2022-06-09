@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.knockknock.mapper.UserMapper">
+
+    <!--    根据用户名获取用户信息-->
+    <select id="findByUsername" parameterType="java.lang.String" resultType="com.knockknock.entity.User">
+        select * from tb_user where user_name = #{userName}
+    </select>
+
+    <!--    根据用户id获取角色信息-->
+    <select id="findRole" parameterType="int" resultType="com.knockknock.entity.Role">
+        SELECT * FROM tb_role WHERE status = 1
+        <if test="userId != null">
+            AND id IN (SELECT role_id FROM users_role WHERE user_id = #{userId})
+        </if>
+    </select>
+
+    <!--    根据用户id获取数据权限信息-->
+    <select id="findPermissions" parameterType="int" resultType="com.knockknock.entity.Permission">
+        SELECT * FROM tb_permission WHERE status = 1
+        <if test="userId != null">
+            AND id IN (SELECT permission_id FROM roles_permissions WHERE role_id IN (SELECT role_id FROM users_role WHERE user_id = #{userId}))
+        </if>
+    </select>
+
+    <!--    根据用户id获取菜单信息-->
+    <select id="findMenus" parameterType="int" resultType="com.knockknock.entity.Menu">
+        SELECT * FROM tb_menu WHERE parent_id is null AND status = 1
+        <if test="userId != null">
+            AND id in (SELECT menu_id FROM roles_menus WHERE role_id in (SELECT role_id FROM user_roles WHERE user_id = #{userId}))
+        </if>
+    </select>
+
+    <!--    获取子菜单信息-->
+    <select id="findChildrenMenus" parameterType="int" resultType="com.knockknock.entity.Menu">
+        SELECT * FROM tb_menu WHERE parent_id = #{id} AND status = 1
+        <if test="userId != null">
+            AND id in (SELECT menu_id FROM roles_menus WHERE role_id in (SELECT role_id FROM users_role WHERE user_id = #{userId}))
+        </if>
+    </select>
+
+
+    <!--    添加角色-->
+    <insert id="insert" parameterType="com.knockknock.entity.User" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        tb_user(user_name, `password`, phone, wx_number, email, university, open_id, avatar, nick_name, `status`)
+        value(#{userName}, #{password}, #{phone}, #{wxNumber}, #{email}, #{university}, #{openId}, #{avatar},
+        #{nickName}, #{status})
+    </insert>
+
+    <!--    删除角色-->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from tb_user where id = #{id}
+    </delete>
+
+    <!--    更新角色信息-->
+    <update id="update" parameterType="com.knockknock.entity.User">
+        update tb_user
+        <set>
+            <if test="password != null">
+                `password` = #{password},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="wxNumber != null">
+                wx_number = #{wxNumber},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="university != null">
+                university = #{university},
+            </if>
+            <if test="openId != null">
+                open_id = #{openId},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--    分页查询-->
+    <select id="findPage" resultType="com.knockknock.entity.User">
+        SELECT * FROM tb_user
+        <if test="queryString != null and queryString.length > 0">
+            WHERE user_name LIKE concat('%',#{queryString} , '%')
+            OR nick_name LIKE concat('%',#{queryString} , '%')
+            OR phone LIKE concat('%',#{queryString} , '%')
+        </if>
+    </select>
+
+    <!--    添加用户拥有的角色-->
+    <insert id="insertUserRole">
+        insert into users_role values (#{userId}, #{roleId})
+    </insert>
+
+    <!--    删除用户拥有的角色-->
+    <delete id="deleteUserRole">
+        delete from users_role where user_id = #{userId}
+    </delete>
+</mapper>

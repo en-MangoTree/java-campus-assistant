@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.knockknock.mapper.RoleMapper">
+<!--        添加角色数据  keyProperty指定返回属性名，useGeneratedKeys是否启用自增id-->
+    <insert id="insert" parameterType="com.knockknock.entity.Role" keyProperty="id" useGeneratedKeys="true">
+        insert into tb_role(label, code, status)
+        value (#{label}, #{code}, #{status})
+    </insert>
+
+<!--        删除角色数据-->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from tb_role where id = #{id}
+    </delete>
+
+<!--        修改角色数据-->
+    <update id="update" parameterType="com.knockknock.entity.Role">
+        update tb_role
+        <set>
+            <if test="label != null">
+                label = #{label},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!--        分页查询-->
+    <select id="findPage" resultType="com.knockknock.entity.Role">
+        SELECT * FROM tb_role
+        <if test="queryString != null and queryString.length > 0">
+            WHERE label LIKE concat('%',#{queryString} , '%') OR code LIKE concat('%',#{queryString} , '%')
+        </if>
+    </select>
+
+<!--    根据角色id查询父级菜单-->
+    <select id="findParentMenuById" resultType="com.knockknock.entity.Menu">
+        select * from tb_menu where parent_id is null and status = 1
+        and id in (select menu_id from roles_menus where role_id = #{roleId})
+    </select>
+
+<!--    根据父级菜单id与角色id查询子级菜单-->
+    <select id="findChildrenMenu" resultType="com.knockknock.entity.Menu">
+        select * from tb_menu where parent_id = #{parentId} and status = 1
+        and id in (select menu_id from roles_menus where role_id = #{roleId})
+    </select>
+
+<!--    根据角色id查询权限信息-->
+    <select id="findPermissionById" resultType="com.knockknock.entity.Permission">
+        select * from tb_permission where status = 1
+         and id in (select permission_id from roles_permissions where role_id = #{roleId})
+    </select>
+
+<!--    根据角色id删除对应权限-->
+    <delete id="deletePermissionById" parameterType="java.lang.Long">
+        delete from roles_permissions where role_id = #{roleId}
+    </delete>
+
+<!--    根据角色id删除对应菜单-->
+    <delete id="deleteMenuById" parameterType="java.lang.Long">
+        delete from roles_menus where role_id = #{roleId}
+    </delete>
+
+<!--    添加角色的权限信息-->
+    <insert id="insertPermission">
+        insert into roles_permissions values (#{roleId}, #{permissionId})
+    </insert>
+
+<!--    添加角色的菜单信息-->
+    <insert id="insertMenu">
+        insert into roles_menus values (#{roleId}, #{menuId})
+    </insert>
+
+<!--    根据label查询角色是否存在-->
+    <select id="findByLabel" parameterType="java.lang.String" resultType="com.knockknock.entity.Role">
+        select * from tb_role where label = #{label}
+    </select>
+</mapper>

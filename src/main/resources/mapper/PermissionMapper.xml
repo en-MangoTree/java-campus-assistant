@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.knockknock.mapper.PermissionMapper">
+<!--    添加权限数据-->
+    <insert id="insert">
+        insert into tb_permission(label, `code`, status) value (#{label}, #{code}, #{status})
+    </insert>
+
+<!--    删除权限数据-->
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from tb_permission where id = #{id}
+    </delete>
+
+<!--    修改权限数据-->
+    <update id="update" parameterType="com.knockknock.entity.Permission">
+        update tb_permission
+        <set>
+            <if test="label != null">
+                label = #{label},
+            </if>
+            <if test="code != null">
+                `code` = #{code},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!--    分页查询-->
+    <select id="findPage" resultType="com.knockknock.entity.Permission">
+        SELECT * FROM tb_permission
+        <if test="queryString != null and queryString.length > 0">
+            WHERE label LIKE concat('%',#{queryString} , '%') OR code LIKE concat('%',#{queryString} , '%')
+        </if>
+    </select>
+
+    <select id="findAll" resultType="com.knockknock.entity.Permission">
+        select * from tb_permission
+    </select>
+</mapper>

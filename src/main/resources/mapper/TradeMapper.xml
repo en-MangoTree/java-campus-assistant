@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.knockknock.mapper.TradeMapper">
+
+    <!--        添加交易数据-->
+    <insert id="insert">
+            insert into
+            tb_trade(title, images, description, price, status)
+            value (#{title}, #{images}, #{description}, #{price}, #{status})
+        </insert>
+
+    <!--        删除交易数据-->
+    <delete id="delete" parameterType="java.lang.Long">
+            delete from tb_trade where id = #{id}
+        </delete>
+
+    <!--        修改交易数据-->
+    <update id="update" parameterType="com.knockknock.entity.Trade">
+        update tb_trade
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="images != null">
+                images = #{images},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--        分页查询-->
+    <select id="findPage" resultType="com.knockknock.entity.Trade">
+        SELECT * FROM tb_trade
+        <if test="queryString != null and queryString.length > 0">
+            AND title LIKE concat('%',#{queryString} , '%')
+        </if>
+    </select>
+
+</mapper>
