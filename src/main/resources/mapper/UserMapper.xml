@@ -29,7 +29,7 @@
     <select id="findMenus" parameterType="int" resultType="com.knockknock.entity.Menu">
         SELECT * FROM tb_menu WHERE parent_id is null AND status = 1
         <if test="userId != null">
-            AND id in (SELECT menu_id FROM roles_menus WHERE role_id in (SELECT role_id FROM user_roles WHERE user_id = #{userId}))
+            AND id in (SELECT menu_id FROM roles_menus WHERE role_id in (SELECT role_id FROM users_role WHERE user_id = #{userId}))
         </if>
     </select>
 
